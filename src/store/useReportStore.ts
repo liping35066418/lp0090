@@ -52,6 +52,7 @@ export const useReportStore = create<ReportState>((set) => ({
   selectedComponentId: null,
   currentTheme: 'minimal_academic',
   isPreviewMode: false,
+  reportTitle: '',
 
   addComponent: (type: ChartType, position: Position) =>
     set((state) => ({
@@ -98,4 +99,7 @@ export const useReportStore = create<ReportState>((set) => ({
 
   clearCanvas: () =>
     set({ components: [], selectedComponentId: null }),
+
+  setReportTitle: (title: string) =>
+    set({ reportTitle: title }),
 }));

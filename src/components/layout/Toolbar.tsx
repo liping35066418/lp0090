@@ -1,6 +1,7 @@
-import { Eye, Trash2, Layout, BookOpen, Presentation } from 'lucide-react';
+import { Eye, Trash2, Layout, BookOpen, Presentation, FileText } from 'lucide-react';
 import { ThemeConfig, THEME_LABELS, ThemeMode } from '../../types';
 import { useReportStore } from '../../store/useReportStore';
+import { useState } from 'react';
 
 interface ToolbarProps {
   theme: ThemeConfig;
@@ -8,7 +9,29 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ theme, onTogglePreview }: ToolbarProps) {
-  const { currentTheme, switchTheme, clearCanvas, components } = useReportStore();
+  const { currentTheme, switchTheme, clearCanvas, components, reportTitle, setReportTitle } = useReportStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const [localTitle, setLocalTitle] = useState(reportTitle);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalTitle(e.target.value);
+  };
+
+  const handleTitleBlur = () => {
+    setReportTitle(localTitle);
+    setIsEditing(false);
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleTitleBlur();
+    }
+  };
+
+  const handleTitleClick = () => {
+    setLocalTitle(reportTitle);
+    setIsEditing(true);
+  };
 
   return (
     <div
@@ -37,15 +60,73 @@ export function Toolbar({ theme, onTogglePreview }: ToolbarProps) {
             color: theme.colors.text,
             fontFamily: theme.typography.headingFont,
             letterSpacing: '0.5px',
+            whiteSpace: 'nowrap',
           }}
         >
           科研汇报可视化制作台
         </h1>
       </div>
 
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, justifyContent: 'flex-start', maxWidth: '400px' }}>
+        <FileText size={16} style={{ color: theme.colors.accent }} />
+        <span style={{ fontSize: '13px', color: theme.colors.accent, whiteSpace: 'nowrap' }}>报告标题:</span>
+        {isEditing ? (
+          <input
+            type="text"
+            value={localTitle}
+            onChange={handleTitleChange}
+            onBlur={handleTitleBlur}
+            onKeyDown={handleTitleKeyDown}
+            autoFocus
+            placeholder="请输入报告标题..."
+            style={{
+              flex: 1,
+              padding: '6px 12px',
+              border: `2px solid ${theme.colors.primary}`,
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontFamily: theme.typography.bodyFont,
+              color: theme.colors.text,
+              backgroundColor: theme.colors.background,
+              outline: 'none',
+              minWidth: '200px',
+            }}
+          />
+        ) : (
+          <div
+            onClick={handleTitleClick}
+            style={{
+              flex: 1,
+              padding: '6px 12px',
+              border: `1px dashed ${theme.mode === 'minimal_academic' ? '#D5D5D0' : '#CBD5E1'}`,
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontFamily: theme.typography.bodyFont,
+              color: reportTitle ? theme.colors.text : theme.colors.accent,
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              minWidth: '200px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = theme.colors.primary;
+              e.currentTarget.style.backgroundColor = theme.mode === 'minimal_academic' ? '#FAFAF7' : '#F8FAFC';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = theme.mode === 'minimal_academic' ? '#D5D5D0' : '#CBD5E1';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            {reportTitle || '点击输入报告标题...'}
+          </div>
+        )}
+      </div>
+
       <div
         style={{
-          flex: 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

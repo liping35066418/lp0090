@@ -3,10 +3,10 @@ import { themes } from '../config/themes';
 import { useReportStore } from '../store/useReportStore';
 import { BaseChart } from '../components/charts/BaseChart';
 import { getShadowClass } from '../config/themes';
-import { THEME_LABELS, ThemeMode } from '../types';
+import { THEME_LABELS, ThemeMode, ChartType, CHART_TYPE_LABELS } from '../types';
 
 export function Preview() {
-  const { components, currentTheme, switchTheme, togglePreview } = useReportStore();
+  const { components, currentTheme, switchTheme, togglePreview, reportTitle } = useReportStore();
   const theme = themes[currentTheme];
 
   const handleExport = () => {
@@ -17,6 +17,20 @@ export function Preview() {
     if (a.position.y !== b.position.y) return a.position.y - b.position.y;
     return a.position.x - b.position.x;
   });
+
+  const chartCounts: Record<ChartType, number> = {
+    line: 0,
+    bar: 0,
+    radar: 0,
+    compare: 0,
+  };
+
+  components.forEach((c) => {
+    chartCounts[c.type]++;
+  });
+
+  const chartTypes: ChartType[] = ['line', 'bar', 'radar', 'compare'];
+  const displayTitle = reportTitle.trim() || '科研工作汇报';
 
   return (
     <div
@@ -89,15 +103,23 @@ export function Preview() {
             >
               科研汇报预览
             </h1>
-            <p
+            <div
               style={{
                 margin: '2px 0 0 0',
                 fontSize: '12px',
                 color: theme.colors.accent,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                flexWrap: 'wrap',
               }}
             >
-              {sortedComponents.length} 个图表组件
-            </p>
+              {chartTypes.map((type) => (
+                <span key={type}>
+                  {CHART_TYPE_LABELS[type]} {chartCounts[type]}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -207,7 +229,7 @@ export function Preview() {
               letterSpacing: '1px',
             }}
           >
-            科研工作汇报
+            {displayTitle}
           </h1>
           <p
             style={{

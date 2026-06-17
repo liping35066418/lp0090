@@ -83,6 +83,7 @@ export interface ReportState {
   selectedComponentId: string | null;
   currentTheme: ThemeMode;
   isPreviewMode: boolean;
+  reportTitle: string;
   addComponent: (type: ChartType, position: Position) => void;
   removeComponent: (id: string) => void;
   updateComponent: (id: string, updates: Partial<ChartComponent>) => void;
@@ -90,6 +91,7 @@ export interface ReportState {
   switchTheme: (theme: ThemeMode) => void;
   togglePreview: () => void;
   clearCanvas: () => void;
+  setReportTitle: (title: string) => void;
 }
 
 export const DIMENSION_LABELS: Record<DataDimension, string> = {
